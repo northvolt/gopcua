@@ -28,44 +28,25 @@ func TestAnonymousIdentityToken(t *testing.T) {
 }
 
 func TestUserNameIdentityToken(t *testing.T) {
+	cases := []codectest.Case{
+		{
+			Name:   "normal",
+			Struct: NewUserNameIdentityToken("username", "user", []byte{0x70, 0x61, 0x73, 0x73, 0x77, 0x6f, 0x72, 0x64}, "plain"),
+			Bytes: []byte{
+				// PolicyID
+				0x08, 0x00, 0x00, 0x00, 0x75, 0x73, 0x65, 0x72, 0x6e, 0x61, 0x6d, 0x65,
+				// UserName
+				0x04, 0x00, 0x00, 0x00, 0x75, 0x73, 0x65, 0x72,
+				// Password
+				0x08, 0x00, 0x00, 0x00, 0x70, 0x61, 0x73, 0x73, 0x77, 0x6f, 0x72, 0x64,
+				// EncryptionAlgorithm
+				0x05, 0x00, 0x00, 0x00, 0x70, 0x6c, 0x61, 0x69, 0x6e,
+			},
 		},
-	},
-}
-
-func TestDecodeUserNameIdentityToken(t *testing.T) {
-	for _, c := range userNameIdentityTokenCases {
-		got, err := DecodeUserNameIdentityToken(c.serialized)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		if diff := cmp.Diff(got, c.structured); diff != "" {
-			t.Errorf("%s failed\n%s", c.description, diff)
-		}
 	}
-}
-
-func TestSerializeUserNameIdentityToken(t *testing.T) {
-	for _, c := range userNameIdentityTokenCases {
-		got, err := c.structured.Serialize()
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		if diff := cmp.Diff(got, c.serialized); diff != "" {
-			t.Errorf("%s failed\n%s", c.description, diff)
-		}
-	}
-}
-
-func TestUserNameIdentityTokenLen(t *testing.T) {
-	for _, c := range userNameIdentityTokenCases {
-		got := c.structured.Len()
-
-		if diff := cmp.Diff(got, len(c.serialized)); diff != "" {
-			t.Errorf("%s failed\n%s", c.description, diff)
-		}
-	}
+	codectest.Run(t, cases, func(b []byte) (codectest.S, error) {
+		return DecodeUserNameIdentityToken(b)
+	})
 }
 
 var x509IdentityTokenCases = []struct {
