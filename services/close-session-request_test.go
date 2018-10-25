@@ -5,11 +5,9 @@
 package services
 
 import (
-	"reflect"
 	"testing"
 	"time"
 
-	"github.com/google/go-cmp/cmp"
 	"github.com/wmnsk/gopcua/datatypes"
 	"github.com/wmnsk/gopcua/utils/codectest"
 )
@@ -70,11 +68,3 @@ func TestCloseSessionRequest(t *testing.T) {
 		}
 	})
 }
-
-// option to regard []T{} and []T{nil} as equal
-// https://godoc.org/github.com/google/go-cmp/cmp#example-Option--EqualEmpty
-var decodeCmpOpt = cmp.FilterValues(func(x, y interface{}) bool {
-	vx, vy := reflect.ValueOf(x), reflect.ValueOf(y)
-	return (vx.IsValid() && vy.IsValid() && vx.Type() == vy.Type()) &&
-		(vx.Kind() == reflect.Slice) && (vx.Len() == 0 && vy.Len() == 0)
-}, cmp.Comparer(func(_, _ interface{}) bool { return true }))

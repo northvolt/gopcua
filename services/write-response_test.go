@@ -94,7 +94,7 @@ func TestDecodeWriteResponse(t *testing.T) {
 		// need to clear Payload here.
 		got.Payload = nil
 
-		if diff := cmp.Diff(got, c.structured, decodeCmpOpt); diff != "" {
+		if diff := cmp.Diff(got, c.structured); diff != "" {
 			t.Errorf("%s failed\n%s", c.description, diff)
 		}
 	}
