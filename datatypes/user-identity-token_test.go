@@ -49,57 +49,22 @@ func TestUserNameIdentityToken(t *testing.T) {
 	})
 }
 
-var x509IdentityTokenCases = []struct {
-	description string
-	structured  *X509IdentityToken
-	serialized  []byte
-}{
-	{
-		"normal",
-		NewX509IdentityToken("x509", "certificate"),
-		[]byte{
-			// PolicyID
-			0x04, 0x00, 0x00, 0x00, 0x78, 0x35, 0x30, 0x39,
-			// CertificateData
-			0x0b, 0x00, 0x00, 0x00, 0x63, 0x65, 0x72, 0x74, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x65,
+func TestX509IdentityToken(t *testing.T) {
+	cases := []codectest.Case{
+		{
+			Name:   "normal",
+			Struct: NewX509IdentityToken("x509", "certificate"),
+			Bytes: []byte{
+				// PolicyID
+				0x04, 0x00, 0x00, 0x00, 0x78, 0x35, 0x30, 0x39,
+				// CertificateData
+				0x0b, 0x00, 0x00, 0x00, 0x63, 0x65, 0x72, 0x74, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x65,
+			},
 		},
-	},
-}
-
-func TestDecodeX509IdentityToken(t *testing.T) {
-	for _, c := range x509IdentityTokenCases {
-		got, err := DecodeX509IdentityToken(c.serialized)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		if diff := cmp.Diff(got, c.structured); diff != "" {
-			t.Errorf("%s failed\n%s", c.description, diff)
-		}
 	}
-}
-
-func TestSerializeX509IdentityToken(t *testing.T) {
-	for _, c := range x509IdentityTokenCases {
-		got, err := c.structured.Serialize()
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		if diff := cmp.Diff(got, c.serialized); diff != "" {
-			t.Errorf("%s failed\n%s", c.description, diff)
-		}
-	}
-}
-
-func TestX509IdentityTokenLen(t *testing.T) {
-	for _, c := range x509IdentityTokenCases {
-		got := c.structured.Len()
-
-		if diff := cmp.Diff(got, len(c.serialized)); diff != "" {
-			t.Errorf("%s failed\n%s", c.description, diff)
-		}
-	}
+	codectest.Run(t, cases, func(b []byte) (codectest.S, error) {
+		return DecodeX509IdentityToken(b)
+	})
 }
 
 var issuedIdentityTokenCases = []struct {
