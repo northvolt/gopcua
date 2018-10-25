@@ -8,7 +8,6 @@ import (
 	"testing"
 
 	"github.com/wmnsk/gopcua/utils/codectest"
-	"github.com/google/go-cmp/cmp"
 )
 
 func TestAnonymousIdentityToken(t *testing.T) {
@@ -67,57 +66,22 @@ func TestX509IdentityToken(t *testing.T) {
 	})
 }
 
-var issuedIdentityTokenCases = []struct {
-	description string
-	structured  *IssuedIdentityToken
-	serialized  []byte
-}{
-	{
-		"normal",
-		NewIssuedIdentityToken("issued", []byte{0x70, 0x61, 0x73, 0x73, 0x77, 0x6f, 0x72, 0x64}, "plain"),
-		[]byte{
-			// PolicyID
-			0x06, 0x00, 0x00, 0x00, 0x69, 0x73, 0x73, 0x75, 0x65, 0x64,
-			// TokenData
-			0x08, 0x00, 0x00, 0x00, 0x70, 0x61, 0x73, 0x73, 0x77, 0x6f, 0x72, 0x64,
-			// EncryptionAlgorithm
-			0x05, 0x00, 0x00, 0x00, 0x70, 0x6c, 0x61, 0x69, 0x6e,
+func TestIssuedIdentityToken(t *testing.T) {
+	cases := []codectest.Case{
+		{
+			Name:   "normal",
+			Struct: NewIssuedIdentityToken("issued", []byte{0x70, 0x61, 0x73, 0x73, 0x77, 0x6f, 0x72, 0x64}, "plain"),
+			Bytes: []byte{
+				// PolicyID
+				0x06, 0x00, 0x00, 0x00, 0x69, 0x73, 0x73, 0x75, 0x65, 0x64,
+				// TokenData
+				0x08, 0x00, 0x00, 0x00, 0x70, 0x61, 0x73, 0x73, 0x77, 0x6f, 0x72, 0x64,
+				// EncryptionAlgorithm
+				0x05, 0x00, 0x00, 0x00, 0x70, 0x6c, 0x61, 0x69, 0x6e,
+			},
 		},
-	},
-}
-
-func TestDecodeIssuedIdentityToken(t *testing.T) {
-	for _, c := range issuedIdentityTokenCases {
-		got, err := DecodeIssuedIdentityToken(c.serialized)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		if diff := cmp.Diff(got, c.structured); diff != "" {
-			t.Errorf("%s failed\n%s", c.description, diff)
-		}
 	}
-}
-
-func TestSerializeIssuedIdentityToken(t *testing.T) {
-	for _, c := range issuedIdentityTokenCases {
-		got, err := c.structured.Serialize()
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		if diff := cmp.Diff(got, c.serialized); diff != "" {
-			t.Errorf("%s failed\n%s", c.description, diff)
-		}
-	}
-}
-
-func TestIssuedIdentityTokenLen(t *testing.T) {
-	for _, c := range issuedIdentityTokenCases {
-		got := c.structured.Len()
-
-		if diff := cmp.Diff(got, len(c.serialized)); diff != "" {
-			t.Errorf("%s failed\n%s", c.description, diff)
-		}
-	}
+	codectest.Run(t, cases, func(b []byte) (codectest.S, error) {
+		return DecodeIssuedIdentityToken(b)
+	})
 }
