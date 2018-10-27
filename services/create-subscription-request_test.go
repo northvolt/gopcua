@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/wmnsk/gopcua/datatypes"
-	"github.com/wmnsk/gopcua/id"
 	"github.com/wmnsk/gopcua/utils/codectest"
 )
 
@@ -22,7 +21,7 @@ func TestCreateSubscriptionRequest(t *testing.T) {
 					NodeID: &datatypes.FourByteNodeID{
 						EncodingMask: 0x01,
 						Namespace:    0,
-						Identifier:   id.CreateSubscriptionRequest_Encoding_DefaultBinary,
+						Identifier:   ServiceTypeCreateSubscriptionRequest,
 					},
 				},
 				RequestHeader: &RequestHeader{
